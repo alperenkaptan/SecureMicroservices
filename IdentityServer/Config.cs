@@ -1,4 +1,5 @@
-﻿using Duende.IdentityServer.Models;
+﻿using Duende.IdentityModel;
+using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Test;
 
 namespace IdentityServer;
@@ -19,6 +20,19 @@ public class Config
                 },
                 AllowedScopes = { "movieAPI" }
             },
+            new Client
+            {
+                ClientId = "movieClientInteractive",
+                AllowedGrantTypes = GrantTypes.Code,
+                ClientSecrets =
+                {
+                    new Secret("secret".Sha256())
+                },
+                RedirectUris = { "https://localhost:7064/signin-oidc" },
+                PostLogoutRedirectUris = { "https://localhost:7064/signout-callback-oidc" },
+                AllowedScopes = { "movieAPI", "openid", "profile" },
+                AllowOfflineAccess = true
+            }
         };
     }
     public static IEnumerable<ApiScope> GetApiScopes()
@@ -32,8 +46,8 @@ public class Config
     {
         return new List<IdentityResource>
         {
-            //new IdentityResources.OpenId(),
-            //new IdentityResources.Profile(),
+            new IdentityResources.OpenId(),
+            new IdentityResources.Profile(),
         };
     }
     public static IEnumerable<ApiResource> GetApiResources()
@@ -54,8 +68,13 @@ public class Config
             new TestUser
             {
                 SubjectId = "1",
-                Username = "test",
-                Password = "123"
+                Username = "admin",
+                Password = "admin",
+                Claims = new List<System.Security.Claims.Claim>
+                {
+                    new System.Security.Claims.Claim(JwtClaimTypes.Name, "Super"),
+                    new System.Security.Claims.Claim(JwtClaimTypes.FamilyName, "Admin")
+                }
             }
         };
     }
