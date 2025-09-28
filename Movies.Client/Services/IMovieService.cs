@@ -2,11 +2,11 @@
 
 public interface IMovieService
 {
-    Task<IEnumerable<Models.Movie>> GetAllMoviesAsync();
-    Task<Models.Movie?> GetMovieByIdAsync(int id);
-    Task<Models.Movie> AddMovieAsync(Models.Movie movie);
-    Task<Models.Movie?> UpdateMovieAsync(int id, Models.Movie movie);
+    Task<IEnumerable<Models.MovieViewModel>> GetAllMoviesAsync();
+    Task<Models.MovieViewModel?> GetMovieByIdAsync(int id);
+    Task<Models.MovieViewModel> AddMovieAsync(Models.MovieViewModel movie);
+    Task<Models.MovieViewModel?> UpdateMovieAsync(int id, Models.MovieViewModel movie);
     Task<bool> DeleteMovieAsync(int id);
-
     Task<bool> SaveChangesAsync();
+    Task<Models.UserInfoViewModel> GetUserInfo();
 }

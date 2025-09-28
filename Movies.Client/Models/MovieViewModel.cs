@@ -1,6 +1,6 @@
 ﻿namespace Movies.Client.Models;
 
-public class Movie
+public class MovieViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; }

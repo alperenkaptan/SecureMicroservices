@@ -1,4 +1,5 @@
 using IdentityServer;
+using IdentityServerHost;
 
 internal class Program
 {
@@ -7,12 +8,11 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddRazorPages();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddIdentityServer()
-            .AddInMemoryClients(Config.GetClients())
-            .AddInMemoryIdentityResources(Config.GetIdentityResources())
-            .AddInMemoryApiResources(Config.GetApiResources())
-            .AddInMemoryApiScopes(Config.GetApiScopes())
-            .AddTestUsers(Config.GetTestUsers())
+        builder.Services.AddIdentityServer()                                 //EFCORE a çevir
+            .AddInMemoryClients(Config.GetClients())                         //EFCORE a çevir
+            .AddInMemoryIdentityResources(Config.GetIdentityResources())     //EFCORE a çevir
+            .AddInMemoryApiScopes(Config.GetApiScopes())                     //EFCORE a çevir
+            .AddTestUsers(TestUsers.Users)
             .AddDeveloperSigningCredential();
 
         var app = builder.Build();

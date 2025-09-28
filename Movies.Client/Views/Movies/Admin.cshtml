@@ -1,0 +1,32 @@
+﻿@model UserInfoViewModel
+@{
+    ViewData["Title"] = "Admin";
+}
+
+<h1>Admin</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Claim Type
+            </th>
+            <th>
+                Claim Value
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model.UserInfoDictionary)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(item => claim.Key)
+                </td>
+                <td>
+                    @Html.DisplayFor(item => claim.Value)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

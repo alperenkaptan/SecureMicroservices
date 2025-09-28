@@ -1,27 +1,25 @@
 ﻿using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Movies.Client.HttpHandler;
 
 public class AuthenticationDelegatingHandler : DelegatingHandler
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ClientCredentialsTokenRequest _tokenRequestModel;
-    public AuthenticationDelegatingHandler(IHttpClientFactory httpClientFactory, ClientCredentialsTokenRequest tokenRequestModel)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public AuthenticationDelegatingHandler(IHttpContextAccessor httpContextAccessor)
     {
-        _httpClientFactory = httpClientFactory;
-        _tokenRequestModel = tokenRequestModel;
+        _httpContextAccessor = httpContextAccessor;
     }
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var httpClient = _httpClientFactory.CreateClient("IdentityServerClient");
-        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(_tokenRequestModel);
-        if (tokenResponse.IsError)
+        var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+        if (!string.IsNullOrWhiteSpace(accessToken))
         {
-            throw new Exception("Problem encountered while fetching the access token", tokenResponse.Exception);
+            request.SetBearerToken(accessToken);
         }
 
-        request.SetBearerToken(tokenResponse.AccessToken);
         return await base.SendAsync(request, cancellationToken);
     }
 

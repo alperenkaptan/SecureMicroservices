@@ -22,24 +22,32 @@ namespace Movies.Client.Controllers
 
         public async Task<IActionResult> Index()
         {
-            LogTokenAndClaims();
+            await LogTokenAndClaims();
             return View(await _movieService.GetAllMoviesAsync());
         }
 
         public async Task LogTokenAndClaims()
         {
             var identityToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.IdToken);
-            Debug.WriteLine($"Identity token: {identityToken}");
+#if DEBUG
             foreach (var claim in User.Claims)
             {
-                Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
+                Debug.WriteLine("Claim Type: " + claim.Type + " - Claim Value: " + claim.Value);
             }
+#endif
         }
 
         public async Task Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+        }
+
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Admin()
+        {
+            var userInfo = await _movieService.GetUserInfo();
+            return View(userInfo);
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -65,7 +73,7 @@ namespace Movies.Client.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Genre,ReleaseDate,Director,Rating")] Movie movie)
+        public async Task<IActionResult> Create([Bind("Id,Title,Genre,ReleaseDate,Director,Rating")] MovieViewModel movie)
         {
             if (ModelState.IsValid)
             {
@@ -93,7 +101,7 @@ namespace Movies.Client.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Genre,ReleaseDate,Director,Rating")] Movie movie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Genre,ReleaseDate,Director,Rating")] MovieViewModel movie)
         {
             if (id != movie.Id)
             {

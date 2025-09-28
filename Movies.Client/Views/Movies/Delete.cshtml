@@ -1,4 +1,4 @@
-﻿@model Movies.Client.Models.Movie
+﻿@model Movies.Client.Models.MovieViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -39,7 +39,7 @@
             @Html.DisplayNameFor(model => model.Rating)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
+            @Html.DisplayNameFor(model => model.Rating)
         </dd>
     </dl>
     
