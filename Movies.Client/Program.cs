@@ -1,10 +1,37 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Duende.IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Net.Http.Headers;
+using Movies.Client.HttpHandler;
 using Movies.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IMovieService, MovieService>();
+
+builder.Services.AddSingleton(new ClientCredentialsTokenRequest
+{
+    ClientId = "movieClient",
+    ClientSecret = "secret",
+    Scope = "movieAPI",
+    Address = "https://localhost:5050/connect/token"
+});
+
+builder.Services.AddHttpClient("IdentityServerClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5050");
+    client.DefaultRequestHeaders.Clear();
+    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+});
+
+builder.Services.AddTransient<AuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient("MoviesAPIClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5051");
+    client.DefaultRequestHeaders.Clear();
+    client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+}).AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -13,7 +40,7 @@ builder.Services.AddAuthentication(options =>
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = "https://localhost:7049";
+        options.Authority = "https://localhost:5050";
         options.ClientId = "movieClientInteractive";
         options.ClientSecret = "secret";
         options.ResponseType = "code";

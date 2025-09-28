@@ -28,8 +28,8 @@ public class Config
                 {
                     new Secret("secret".Sha256())
                 },
-                RedirectUris = { "https://localhost:7064/signin-oidc" },
-                PostLogoutRedirectUris = { "https://localhost:7064/signout-callback-oidc" },
+                RedirectUris = { "https://localhost:6060/signin-oidc" },
+                PostLogoutRedirectUris = { "https://localhost:6060/signout-callback-oidc" },
                 AllowedScopes = { "movieAPI", "openid", "profile" },
                 AllowOfflineAccess = true
             }

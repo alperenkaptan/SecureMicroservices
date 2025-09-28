@@ -1,9 +1,16 @@
 ﻿using Movies.Client.Models;
+using System.Text.Json;
+
 
 namespace Movies.Client.Services;
 
 public class MovieService : IMovieService
 {
+    private readonly IHttpClientFactory _httpClientFactory;
+    public MovieService(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
     public Task<Movie> AddMovieAsync(Movie movie)
     {
         throw new NotImplementedException();
@@ -16,13 +23,14 @@ public class MovieService : IMovieService
 
     public async Task<IEnumerable<Movie>> GetAllMoviesAsync()
     {
-        var movieList = new List<Movie>
-        {
-            new Movie { Id = 1, Title = "Inception", Director = "Christopher Nolan", ReleaseDate = new DateTime(1964, 9, 22) },
-            new Movie { Id = 2, Title = "The Matrix", Director = "The Wachowskis", ReleaseDate = new DateTime(1974, 9, 22) },
-            new Movie { Id = 3, Title = "Interstellar", Director = "Christopher Nolan", ReleaseDate = new DateTime(1994, 9, 22) }
-        };
-        return await Task.FromResult(movieList);
+        var client = _httpClientFactory.CreateClient("MoviesAPIClient");
+        var response = await client.GetAsync("/api/movies");
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync();
+        var movieList = JsonSerializer.Deserialize<List<Movie>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return movieList ?? new List<Movie>();
     }
 
     public Task<Movie?> GetMovieByIdAsync(int id)
